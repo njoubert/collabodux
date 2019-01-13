@@ -10,40 +10,47 @@ import {
   setUserFocus,
   setUserName,
 } from './actions';
-import { patch } from './immer';
 import { fsaReducerBuilder } from './fsa-reducer-builder';
-import { IModelState, ITodo, IUser, validateAndAddDefaults } from './model';
-import { applyPatches, Draft, Patch } from 'immer';
+import { IModelState, ITodo, IUser } from './model';
 import shallowequal from 'shallowequal';
-import { diff3MergeStrings } from '../utils/merge-edits';
+import { EditDoc } from 'automerge';
 
-export const reducer = fsaReducerBuilder<IModelState, Patch>()
-  .add(loadState, (state, { newState }) => validateAndAddDefaults(newState))
+export const reducer = fsaReducerBuilder<IModelState>()
+  .add(loadState, (state) => {
+    if (!state.todos) {
+      state.todos = [];
+    }
+    if (!state.title) {
+      state.title = '';
+    }
+    if (!state.subtitle) {
+      state.subtitle = '';
+    }
+    if (!state.users) {
+      state.users = {};
+    }
+  })
   .add(
     setTitle,
-    patch((draft, { priorTitle, title }) => {
-      draft.title = diff3MergeStrings(priorTitle, draft.title, title);
-    }),
+    (draft, { priorTitle, title }) => {
+      draft.title = title;
+    },
   )
   .add(
     setSubtitle,
-    patch((draft, { priorSubtitle, subtitle }) => {
-      draft.subtitle = diff3MergeStrings(
-        priorSubtitle,
-        draft.subtitle,
-        subtitle,
-      );
-    }),
+    (draft, { priorSubtitle, subtitle }) => {
+      draft.subtitle = subtitle;
+    },
   )
   .add(
     setLongText,
-    patch((draft, { priorText, text }) => {
-      draft.longtext = diff3MergeStrings(priorText, draft.longtext, text);
-    }),
+    (draft, { priorText, text }) => {
+      draft.longtext = text;
+    },
   )
   .add(
     addTodo,
-    patch((draft) => {
+    (draft) => {
       const todo: ITodo = {
         label: '',
         done: false,
@@ -53,56 +60,52 @@ export const reducer = fsaReducerBuilder<IModelState, Patch>()
       } else {
         draft.todos = [todo];
       }
-    }),
+    },
   )
   .add(
     setTodoLabel,
-    patch((draft, { index, priorLabel, label }) => {
+    (draft, { index, priorLabel, label }) => {
       if (draft.todos && draft.todos[index]) {
-        draft.todos[index].label = diff3MergeStrings(
-          priorLabel,
-          draft.todos[index].label,
-          label,
-        );
+        draft.todos[index].label = label;
       }
-    }),
+    },
   )
   .add(
     setTodoDone,
-    patch((draft, { index, done }) => {
+    (draft, { index, done }) => {
       if (draft.todos && draft.todos[index]) {
         draft.todos[index].done = done;
       }
-    }),
+    },
   )
   .add(
     removeUsers,
-    patch((draft, { users }) => {
+    (draft, { users }) => {
       users.forEach((user) => {
         delete draft.users[user];
       });
-    }),
+    },
   )
   .add(
     setUserName,
-    patch((draft, { session, priorUsername, username }) => {
+    (draft, { session, priorUsername, username }) => {
       const user = ensureUser(draft, session);
-      user.username = diff3MergeStrings(priorUsername, user.username, username);
-    }),
+      user.username = username;
+    },
   )
   .add(
     setUserFocus,
-    patch((draft, { session, focus, select }) => {
+    (draft, { session, focus, select }) => {
       const user = ensureUser(draft, session);
       user.focus = focus;
       if (!shallowequal(user.select, select)) {
         user.select = select;
       }
-    }),
+    },
   )
   .build();
 
-function ensureUser(draft: Draft<IModelState>, session: string): Draft<IUser> {
+function ensureUser(draft: EditDoc<IModelState>, session: string): EditDoc<IUser> {
   if (!draft.users[session]) {
     draft.users[session] = {
       username: '',

@@ -2,9 +2,7 @@ import actionCreatorFactory from 'typescript-fsa';
 
 const actionCreator = actionCreatorFactory();
 
-export const loadState = actionCreator<{
-  newState: any;
-}>('LOAD_STATE');
+export const loadState = actionCreator<void>('LOAD_STATE');
 
 export const setTitle = actionCreator<{
   priorTitle: string;

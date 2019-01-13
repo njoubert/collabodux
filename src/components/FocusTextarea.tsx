@@ -1,9 +1,9 @@
 import React, { useRef } from 'react';
 import getCaretCoordinates from 'textarea-caret';
 
-import { useSession } from '../client/collabodux-hooks';
+import { useSession } from '../client/automerge-hooks';
 import { setUserFocus } from '../dux/actions';
-import { usePropose } from '../client/collabodux-fsa-hooks';
+import { usePropose } from '../client/automerge-fsa-hooks';
 import { collabodux } from '../dux/connection';
 import { useUserMap } from '../dux/use-user-map';
 import toMaterialStyle from 'material-color-hash';

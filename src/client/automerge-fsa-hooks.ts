@@ -1,5 +1,5 @@
-import { Collabodux } from './collabodux';
 import { Action, ActionCreator } from 'typescript-fsa';
+import { Automerger } from './automerger';
 
 type ActionProposer<Payload> = Payload extends void
   ? () => void
@@ -9,13 +9,12 @@ export function usePropose<
   State,
   BaseAction,
   Payload,
-  Patch,
   TAction extends BaseAction & Action<Payload>
 >(
-  collabodux: Collabodux<State, BaseAction, Patch>,
+  automerger: Automerger<State, BaseAction>,
   actionCreator: ActionCreator<Payload>,
 ) {
   return ((payload: Payload) => {
-    collabodux.propose(actionCreator(payload) as TAction);
+    automerger.propose(actionCreator(payload) as TAction);
   }) as ActionProposer<Payload>;
 }

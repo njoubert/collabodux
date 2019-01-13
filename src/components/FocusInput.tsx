@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import getCaretCoordinates from 'textarea-caret';
 
-import { useSession } from '../client/collabodux-hooks';
+import { useSession } from '../client/automerge-hooks';
 import { setUserFocus } from '../dux/actions';
-import { usePropose } from '../client/collabodux-fsa-hooks';
-import { collabodux } from '../dux/connection';
+import { usePropose } from '../client/automerge-fsa-hooks';
+import { automerger } from '../dux/connection';
 import { useUserMap } from '../dux/use-user-map';
 import toMaterialStyle from 'material-color-hash';
 
@@ -21,9 +21,9 @@ export default function FocusInput({
   value: string;
   textarea?: boolean;
 } & React.InputHTMLAttributes<HTMLInputElement>) {
-  const proposeSetUserFocus = usePropose(collabodux, setUserFocus);
-  const currentSession = useSession(collabodux);
-  const sessionMap = useUserMap(collabodux);
+  const proposeSetUserFocus = usePropose(automerger, setUserFocus);
+  const currentSession = useSession(automerger);
+  const sessionMap = useUserMap(automerger);
   const otherFocuses = Object.keys(sessionMap).filter((session) => {
     const { focus, select } = sessionMap[session];
     return session !== currentSession && focus === focusId && select;

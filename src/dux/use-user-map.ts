@@ -1,12 +1,12 @@
-import { useMappedLocalState, useSessions } from '../client/collabodux-hooks';
+import { useMappedLocalState, useSessions } from '../client/automerge-hooks';
 import { IModelState, IUser } from './model';
-import { Collabodux } from '../client/collabodux';
+import { Automerger } from '../client/automerger';
 
 export function useUserMap<Action, Patch>(
-  collabodux: Collabodux<IModelState, Action, Patch>,
+  automerger: Automerger<IModelState, Action>,
 ): Record<string, IUser> {
-  const sessions = useSessions(collabodux);
-  const users = useMappedLocalState(collabodux, ({ users }) => users);
+  const sessions = useSessions(automerger);
+  const users = useMappedLocalState(automerger, ({ users }) => users);
   const map: Record<string, IUser> = {};
   for (const session of sessions) {
     map[session] = users[session] || {};

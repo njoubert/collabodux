@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './App.module.css';
-import { useMappedLocalState, useSession } from './client/collabodux-hooks';
+import { useMappedLocalState, useSession } from './client/automerge-hooks';
 import {
   addTodo,
   setLongText,
@@ -10,7 +10,7 @@ import {
   setTodoLabel,
   setUserName,
 } from './dux/actions';
-import { usePropose } from './client/collabodux-fsa-hooks';
+import { usePropose } from './client/automerge-fsa-hooks';
 import { collabodux } from './dux/connection';
 import { useUserMap } from './dux/use-user-map';
 import Focus from './components/Focus';
